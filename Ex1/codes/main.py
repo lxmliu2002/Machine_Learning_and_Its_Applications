@@ -11,10 +11,10 @@ from evaluate import predict, cal_accuracy
 if __name__ == '__main__':
     # initialize the parameters needed
     mnist_dir = "mnist_data/"
-    train_data_dir = "train-images-idx3-ubyte"
-    train_label_dir = "train-labels-idx1-ubyte"
-    test_data_dir = "t10k-images-idx3-ubyte"
-    test_label_dir = "t10k-labels-idx1-ubyte"
+    train_data_dir = "train-images.idx3-ubyte"
+    train_label_dir = "train-labels.idx1-ubyte"
+    test_data_dir = "t10k-images.idx3-ubyte"
+    test_label_dir = "t10k-labels.idx1-ubyte"
     k = 10
     iters = 500
     alpha = 0.5
@@ -30,6 +30,5 @@ if __name__ == '__main__':
     # evaluate on the testset
     y_predict = predict(test_images, theta)
     accuracy  = cal_accuracy(y_predict, test_labels)
-    print('accuracy:', accuracy)
-    print("Finished test. ") 
-    
+    print('accuracy:', accuracy, '%')
+    print("Finished test. ")

@@ -7,19 +7,19 @@ def predict(test_images, theta):
     preds = np.argmax(scores, axis=1)
     return preds
 
-# def cal_accuracy(y_pred, y):
-#     # TODO: Compute the accuracy among the test set and store it in acc
-    
-#     return acc
 def cal_accuracy(y_pred, y):
     # TODO: Compute the accuracy among the test set and store it in acc
+    # check lenth
+    if len(y_pred) != len(y):
+        raise ValueError("The lengths of the predicted values and the actual labels are not consistent")
 
-    # 将y展平成1维向量
-    y = y.flatten()
-    # 正确个数
-    right = np.sum(y_pred == y)
-    # 总个数
-    total = y_pred.shape[0]
-    acc = right/total
+    correct = 0
+    total = len(y)
 
-    return acc
+    for i in range(total):
+        if y_pred[i] == y[i]:
+            correct += 1
+
+    accuracy = (correct / total) * 100.0
+
+    return accuracy
