@@ -30,5 +30,6 @@ if __name__ == '__main__':
     # evaluate on the testset
     y_predict = predict(test_images, theta)
     accuracy  = cal_accuracy(y_predict, test_labels)
+    print('accuracy:', accuracy)
     print("Finished test. ") 
     

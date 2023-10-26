@@ -12,6 +12,7 @@ def train(train_images, train_labels, k, iters = 5, alpha = 0.5):
     
     # Initialize theta.  Use a matrix where each column corresponds to a class,
     # and each row is a classifier coefficient for that class.
+    np.random.seed(23)
     theta = np.random.rand(k, n) # [k,n]
     # do the softmax regression
     theta = softmax_regression(theta, x, y, iters, alpha)
