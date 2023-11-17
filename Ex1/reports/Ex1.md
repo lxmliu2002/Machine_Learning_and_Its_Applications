@@ -40,21 +40,21 @@ https://github.com/lxmliu2002/Machine_Learning_and_Its_Applications
 给定的MNIST数据集是由 0〜9 手写数字图片和数字标签所组成的，包括 60000 个训练样本和 10000 个测试样本，每个样本都是一张 $28\times28$ 像素的灰度手写数字图片。
 
 - **数据加载**：数据加载过程包括从数据文件中读取图像和标签数据。使用了自定义的 `load_mnist` 函数来完成数据的二进制读取和解析。训练集包含图像和相应的标签，测试集也包含类似的数据。
-- **数据预处理**：在 Softmax 回归模型中，数据预处理非常重要。本次实验中进行了以下数据预处理步骤：
-  - **图像二值化**：将灰度图像二值化，将像素值小于等于 40 的设为 0，大于 40 的设为 1。这有助于简化图像特征，使其更适合 Softmax 回归模型的处理。
+- **数据预处理**：在 softmax 回归模型中，数据预处理非常重要。本次实验中进行了以下数据预处理步骤：
+  - **图像二值化**：将灰度图像二值化，将像素值小于等于 40 的设为 0，大于 40 的设为 1。这有助于简化图像特征，使其更适合 softmax 回归模型的处理。
   - **标签转换**：将标签进行独热编码，其中每个样本的真实标签由一个包含 10 个元素的向量表示，其中只有一个元素为 1，表示样本所属的类别。
 
-## （二）Softmax回归模型
+## （二）softmax回归模型
 
-Softmax 回归是一种用于多类别分类的机器学习模型，通常用于将输入数据分为多个不同的类别。在本实验中，使用 Softmax 回归模型来处理MNIST数据集，将手写数字图像分为 10 个不同的数字类别（0 到 9）。其基本原理如下：
+softmax 回归是一种用于多类别分类的机器学习模型，通常用于将输入数据分为多个不同的类别。在本实验中，使用 softmax 回归模型来处理MNIST数据集，将手写数字图像分为 10 个不同的数字类别（0 到 9）。其基本原理如下：
 
 - **输入数据**：输入数据是图像，每个图像由像素组成。这些像素构成了特征向量，表示了图像的特征。
-- **参数矩阵 `theta`**：Softmax 回归模型使用一个参数矩阵 `theta`，其中每一行对应一个类别，每一列对应一个特征。在的实验中， `theta` 的形状是 (k, n)，其中 `k` 表示类别数量， `n` 表示特征数量。每一行 `theta[i]` 包含了对应类别 `i` 的分类器的权重。
-- **预测过程**：给定输入特征向量 `x`，Softmax 回归模型计算每个类别的得分，得分用向量 `score` 表示。然后，通过 Softmax 函数将这些得分转化为类别概率分布。Softmax 函数的计算公式为 $softmax(z)_i=\dfrac{e^{z_{i}}}{\Sigma^{k}_{j=1}e^{z_{j}}}$。其中 $k$ 表示类别数量。
+- **参数矩阵 `theta`**：softmax 回归模型使用一个参数矩阵 `theta`，其中每一行对应一个类别，每一列对应一个特征。在的实验中， `theta` 的形状是 (k, n)，其中 `k` 表示类别数量， `n` 表示特征数量。每一行 `theta[i]` 包含了对应类别 `i` 的分类器的权重。
+- **预测过程**：给定输入特征向量 `x`，softmax 回归模型计算每个类别的得分，得分用向量 `score` 表示。然后，通过 softmax 函数将这些得分转化为类别概率分布。softmax 函数的计算公式为 $softmax(z)_i=\dfrac{e^{z_{i}}}{\Sigma^{k}_{j=1}e^{z_{j}}}$。其中 $k$ 表示类别数量。
 - **损失函数**：本次实验使用交叉熵损失函数来衡量模型的预测与实际标签之间的差异。损失函数的计算公式为 $Loss = -\dfrac{1}{m}\Sigma^{m}_{i=1}\Sigma^k_{j=1}y_{ij}\log(softmax(z)_j)$。其中，$m$ 表示训练样本数量， $k$ 表示类别数量， $y_{ij}$ 是一个二元指示函数，当类别 $j$ 是样本 $i$ 的真实类别时为 1，否则为 0。
-  - 为了训练分类器，需要计算损失函数的梯度。具体来说，需要计算关于模型参数 $\theta$ 的偏导数 $\frac{\partial J}{\partial \theta}$。根据链式法则，可以将 $\frac{\partial J}{\partial \theta}$ 表示为 $\frac{\partial J}{\partial \hat{y}} \frac{\partial \hat{y}}{\partial z} \frac{\partial z}{\partial \theta}$ 的形式，其中 $\hat{y}$ 表示 Softmax 函数的输出，z 表示 Softmax 函数的输入。根据这个公式，可以分别计算 $\frac{\partial J}{\partial \hat{y}}$、$\frac{\partial \hat{y}}{\partial z}$ 和 $\frac{\partial z}{\partial \theta}$ 的值，从而得到 $\frac{\partial J}{\partial \theta}$ 的值。
+  - 为了训练分类器，需要计算损失函数的梯度。具体来说，需要计算关于模型参数 $\theta$ 的偏导数 $\frac{\partial J}{\partial \theta}$。根据链式法则，可以将 $\frac{\partial J}{\partial \theta}$ 表示为 $\frac{\partial J}{\partial \hat{y}} \frac{\partial \hat{y}}{\partial z} \frac{\partial z}{\partial \theta}$ 的形式，其中 $\hat{y}$ 表示 softmax 函数的输出，z 表示 softmax 函数的输入。根据这个公式，可以分别计算 $\frac{\partial J}{\partial \hat{y}}$、$\frac{\partial \hat{y}}{\partial z}$ 和 $\frac{\partial z}{\partial \theta}$ 的值，从而得到 $\frac{\partial J}{\partial \theta}$ 的值。
 
-- **训练过程**：Softmax回归通过梯度下降算法来最小化损失函数，以学习参数 `theta`。在每个训练迭代中，计算梯度并更新参数，以使损失函数逐渐减小。梯度的计算公式为 $Gradient=\dfrac{1}{m}\Sigma^{m}_{i=1}(sfotmax(z)_i-y_i)\times x_i$，更新梯度的公式为 $\theta_{new} = \theta_{old}-\alpha\times Gradient$。
+- **训练过程**：softmax回归通过梯度下降算法来最小化损失函数，以学习参数 `theta`。在每个训练迭代中，计算梯度并更新参数，以使损失函数逐渐减小。梯度的计算公式为 $Gradient=\dfrac{1}{m}\Sigma^{m}_{i=1}(sfotmax(z)_i-y_i)\times x_i$，更新梯度的公式为 $\theta_{new} = \theta_{old}-\alpha\times Gradient$。
 
 在的实验中，将 `k` 设置为 10（10 个不同的数字类别），`theta` 是一个形状为 (10, n) 的参数矩阵，`iters` 控制了训练的迭代次数，`alpha` 是学习率，控制了参数更新的步长。
 
@@ -106,7 +106,7 @@ def softmax_regression(theta, x, y, iters, alpha):
 
 最后，进行数据的分类预测。
 
-- **预测过程**：使用训练好的Softmax回归模型，对测试集中的图像进行预测。通过将测试图像的特征与参数矩阵 `theta` 相乘，可以得到一个得分向量，表示该图像属于每个类别的得分，择具有最高得分的类别作为图像的预测类别。
+- **预测过程**：使用训练好的 softmax 回归模型，对测试集中的图像进行预测。通过将测试图像的特征与参数矩阵 `theta` 相乘，可以得到一个得分向量，表示该图像属于每个类别的得分，择具有最高得分的类别作为图像的预测类别。
 
 - **准确率计算**：将预测的结果与测试集中的实际标签进行比较，计算公式为 $Accuracy = \dfrac{Number \enspace of \enspace correct \enspace predictions}{Total \enspace number \enspace of \enspace test \enspace samples}\times 100\%$。代码实现如下：
 
