@@ -66,9 +66,15 @@ https://www.cnblogs.com/fengff/p/10173071.html
 
 https://cloud.tencent.com/developer/article/1931721
 
-https://ieeexplore.ieee.org/abstract/document/9067661
+http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf
 
-Z. -H. Zhang, Z. Yang, Y. Sun, Y. -F. Wu and Y. -D. Xing, "Lenet-5 Convolution Neural Network with Mish Activation Function and Fixed Memory Step Gradient Descent Method," 2019 16th International Computer Conference on Wavelet Active Media Technology and Information Processing, Chengdu, China, 2019, pp. 196-199, doi: 10.1109/ICCWAMTIP47768.2019.9067661.
+[Lenet5实现及代码详解——以MINST数据集为例_lenet5代码-CSDN博客](https://blog.csdn.net/qq_43569111/article/details/102589199)
 
+[LeNet5代码pytorch lenet5代码参数_flybirdfly的技术博客_51CTO博客](https://blog.51cto.com/u_13250/7695702)
 
+[笔记: Batch Normalization及其反向传播 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/45614576)
+
+[Convolution卷积层的前向传播和反向传播 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/642200457)
+
+[程序部分_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Dy4y1m7Y9?p=9&spm_id_from=pageDriver&vd_source=9163aa1a7bcc153d0c52418e82e0a7ff)
 

@@ -1,3 +1,5 @@
 **/.vscode
 **/.history
 *.DS_Store
+**/__pycache__
+Ex2/codes/lenet5
