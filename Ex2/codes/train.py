@@ -1,74 +1,125 @@
-import data_process
-import lenet5
-from layers.loss import SoftMax
-import tqdm
+# coding: utf-8
 import numpy as np
-from layers.optimizer import Adam
+import utils
+import logging
 
-batch_size = 256
-epochs = 10
-lr = 1e-3
+# 配置日志
+logging.basicConfig(
+    filename = "log.log",
+    level = logging.DEBUG,
+    format = "%(asctime)s %(levelname)s:%(message)s",
+)
 
-data = data_process.set_data()
-Lenet5 = lenet5.LeNet5()
-optimizer = Adam(Lenet5.get_params(), lr)
 
-loss_list = []
-acc_list = []
+class Trainer:
+    """
+    神经网络的训练器
+    """
 
-def train(loss_list, acc_list):
-    best_acc = 0
-    best_weight = None
+    def __init__(
+        self,
+        network,
+        x_train,
+        t_train,
+        x_test,
+        t_test,
+        epochs = 20,
+        mini_batch_size = 100,
+        optimizer = "SGD",
+        optimizer_param = {"lr": 0.01},
+        evaluate_sample_num_per_epoch = None,
+        verbose = True,
+    ):
+        self.network = network
+        self.verbose = verbose
+        self.x_train = x_train
+        self.t_train = t_train
+        self.x_test = x_test
+        self.t_test = t_test
+        self.epochs = epochs
+        self.batch_size = mini_batch_size
+        self.evaluate_sample_num_per_epoch = evaluate_sample_num_per_epoch
 
-    for epoch in range(epochs):
-        # Training
-        total_batches = int(data['train_image'].shape[0] / batch_size)
-        pbar = tqdm.tqdm(range(total_batches), ncols = 150)
-        for batch_idx in pbar:
-            batch_X, batch_y = data_process.get_batch(data["train_image"], data["train_label"], batch_size)
-            pred = Lenet5.forward(batch_X)
-            loss = SoftMax.loss(pred, batch_y)
-            grad = SoftMax.gradient(pred, batch_y)
-            acc = SoftMax.accuracy(pred, batch_y)
+        # optimizer
+        optimizer_class_dict = {
+            "sgd": utils.SGD,
+            "momentum": utils.Momentum,
+            "adam": utils.Adam,
+            "rmsprop": utils.RMSprop,
+            "adagrad": utils.AdaGrad,
+        }
+        self.optimizer = optimizer_class_dict[optimizer.lower()](**optimizer_param)
 
-            loss_list.append(loss)
-            acc_list.append(acc)
+        # 训练相关的参数
+        self.train_size = x_train.shape[0]
+        self.iter_per_epoch = max(self.train_size / mini_batch_size, 1)
+        self.max_iter = int(epochs * self.iter_per_epoch)
+        self.current_iter = 0
+        self.current_epoch = 0
+        # 记录每次epoch的识别精度
+        self.train_loss_list = []
+        self.train_acc_list = []
+        self.test_acc_list = []
 
-            Lenet5.backward(grad)
-            optimizer.step()
+    def train_step(self):
+        batch_mask = np.random.choice(self.train_size, self.batch_size)
+        x_batch = self.x_train[batch_mask]
+        t_batch = self.t_train[batch_mask]
 
-            pbar.set_description(f"Epoch: {epoch+1}/{epochs}")
-            pbar.set_postfix(loss=loss, acc=acc)
+        grads = self.network.gradient(x_batch, t_batch)
+        self.optimizer.update(self.network.params, grads)
 
-        # Validation
-        val_train, val_label = data["val_train"], data["val_label"]
-        val_train_pred = Lenet5.forward(val_train)
-        val_train_pred = np.argmax(val_train_pred, axis = 1)
-        val_acc = np.mean(val_train_pred == val_label.reshape(1, val_label.shape[0]))
+        loss = self.network.loss(x_batch, t_batch)
+        self.train_loss_list.append(loss)
+        if self.verbose:
+            print("train loss:" + str(loss))
 
-        if val_acc > best_acc:
-            best_acc = val_acc
-            best_weight = Lenet5.get_params()
+        # 每个epoch结束
+        if self.current_iter % self.iter_per_epoch == 0:
+            self.current_epoch += 1
 
-        pbar.set_postfix(val_acc = val_acc)
+            x_train_sample, t_train_sample = self.x_train, self.t_train
+            x_test_sample, t_test_sample = self.x_test, self.t_test
+            # 如果有指定每个epoch的样本数，则从训练集中随机抽取指定数目的样本进行评估
+            if not self.evaluate_sample_num_per_epoch is None:
+                t = self.evaluate_sample_num_per_epoch
+                x_train_sample, t_train_sample = self.x_train[:t], self.t_train[:t]
+                x_test_sample, t_test_sample = self.x_test[:t], self.t_test[:t]
+            # 计算训练集和测试集的识别精度
+            train_acc = self.network.accuracy(x_train_sample, t_train_sample)
+            test_acc = self.network.accuracy(x_test_sample, t_test_sample)
+            self.train_acc_list.append(train_acc)
+            self.test_acc_list.append(test_acc)
+            # 输出
+            if self.verbose:
+                logging.info(
+                    "=== epoch:"
+                    + str(self.current_epoch)
+                    + ", train acc:"
+                    + str(train_acc)
+                    + ", test acc:"
+                    + str(test_acc)
+                    + " ==="
+                )
+                print(
+                    "=== epoch:"
+                    + str(self.current_epoch)
+                    + ", train acc:"
+                    + str(train_acc)
+                    + ", test acc:"
+                    + str(test_acc)
+                    + " ==="
+                )
+        self.current_iter += 1
 
-    return best_weight
+    def train(self):
+        for i in range(self.max_iter):
+            self.train_step()
+        # 测试集上的识别精度
+        test_acc = self.network.accuracy(self.x_test, self.t_test)
 
-def test(model, best_weight, data):
-    test_image, test_label = data["test_image"], data["test_label"]
-
-    # Set the model parameters to the best weight
-    model.set_params(best_weight)
-
-    # Set the model to evaluation mode
-    model.eval()
-
-    # Forward pass
-    y_pred = model.forward(test_image)
-    y_pred = np.argmax(y_pred, axis=1)
-
-    # Calculate accuracy
-    acc = np.mean(y_pred == test_label.reshape(1, test_label.shape[0]))
-
-    # Print more detailed test results
-    print(f"Test Accuracy: {acc}")
+        if self.verbose:
+            logging.info("=============== Final Test Accuracy ===============")
+            logging.info("test acc:" + str(test_acc))
+            print("=============== Final Test Accuracy ===============")
+            print("test acc:" + str(test_acc))
