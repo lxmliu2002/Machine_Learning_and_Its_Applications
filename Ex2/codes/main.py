@@ -60,10 +60,15 @@ print("Saved Network Parameters!")
 
 markers = {"train": "o", "test": "s"}
 x = np.arange(max_epochs)
-plt.plot(x, trainer.train_acc_list, marker="o", label="train", markevery=2)
-plt.plot(x, trainer.test_acc_list, marker="s", label="test", markevery=2)
+plt.plot(x, trainer.train_acc_list, marker = "o", label = "train")
+plt.plot(x, trainer.test_acc_list, marker = "s", label = "test")
 plt.xlabel("epochs")
 plt.ylabel("accuracy")
 plt.ylim(0, 1.0)
-plt.legend(loc="lower right")
+plt.legend(loc = "lower right")
 plt.savefig("accuracy.png")
+
+plt.plot(trainer.train_loss_list)
+plt.xlabel("iteration")
+plt.ylabel("train_loss")
+plt.savefig("loss.png")
